@@ -1,11 +1,6 @@
 import pytest
-from src.desconto import DescontoNormal, DescontoVIP
 
-@pytest.mark.parametrize("valor, esperando", {
-    (100, 30),
-    (200, 60),
-    (300, 90)
-})
+from src.desconto import DescontoNormal, DescontoVIP
 
 def test_desconto_normal():
     desconto = DescontoNormal()
@@ -17,7 +12,9 @@ def desconto_vip():
     return DescontoVIP()
 
 def test_desconto_vip_100(desconto_vip):
-    assert DescontoVIP(100) == 20
+    resultado = desconto_vip.calcular(100)
+    assert resultado == 20, f"Esperando 20, mas obteve {resultado}"
 
-def test_desconto_vip_20(desconto_vip):
-    assert DescontoVIP(200) == 40
+def test_desconto_vip_200(desconto_vip):
+    resultado = desconto_vip.calcular(200)
+    assert resultado == 40, f"Esperando 40, mas obteve {resultado}"
