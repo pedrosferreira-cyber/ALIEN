@@ -1,5 +1,8 @@
-import sys 
-import pygame
+import sys
+try:
+    import pygame  # type: ignore[reportMissingImports]
+except ImportError as exc:
+    raise ImportError("Pygame is required to run Alien Invasion. Install it with 'pip install pygame'.") from exc
 
 from settings import Settings
 from ship import Ship
@@ -16,22 +19,18 @@ class AlienInvasion:
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
-        
-        # Criando uma instância da classe Ship para representar a nave espacial
+       
         self.ship = Ship(self.screen, self.settings)
         
-        # Mudando a cor do plano de fundo em RGB
         self.bg_color = (self.settings.bg_color)
         
-        self.bullets = pygame.sprite.Group() # Cria um grupo para armazenar os projéteis disparados pela nave
+        self.bullets = pygame.sprite.Group() 
     
-        self.aliens = pygame.sprite.Group() # Cria um grupo para armazenar os alienígenas presentes no jogo
-    
+        self.aliens = pygame.sprite.Group() 
     
     def create_fleet(self) -> None:
         """Cria uma frota de alienígenas."""
-        # Cria um alienígena e calcula o número de alienígenas em uma linha
-        # O espaçamento entre os alienígenas é igual a um alienígena
+       
         alien = Alien(self.screen, self.settings)
         alien_width = alien.rect.width
         alien_height = alien.rect.height
@@ -84,18 +83,8 @@ class AlienInvasion:
             
             self.event_handler()
 
-            # Redesenha a tela a cada passagem pelo laço
-            self.screen.fill(self.bg_color)
-            
-            # Redesenha a nave em sua posição atual
-            self.ship.blitme()
-            
-            #alien.drawme() # Desenha os alienígenas presentes no grupo de alienígenas na tela
-            self.aliens.draw(self.screen) # Desenha os alienígenas presentes no grupo de alienígenas na tela
-            
-            # Atualiza a posição da nave com base na variável de controle
-            self.ship.update() 
-            
+            # Atualiza os estados do jogo antes de desenhar
+            self.ship.update()
             Bullet.bullet_update(self)
             self.bullets.update() # Atualiza a posição de cada projétil no grupo de projéteis
             Bullet.verify_bullets(self)
@@ -103,14 +92,18 @@ class AlienInvasion:
             # Verifica se algum projétil atingiu um alienígena
             # Em caso afirmativo, remove o projétil e o alienígena atingido
             pygame.sprite.groupcollide(self.bullets, self.aliens, True, True) # Verifica as colisões entre os projéteis e os alienígenas, removendo ambos quando uma colisão é detectada
-                        
+
+            self.aliens.update() # Atualiza a posição de cada alienígena no grupo de alienígenas
             Alien.alien_border(self)
+            Alien.alien_collision(self)
+
+            # Redesenha a tela a cada passagem pelo laço
+            self.screen.fill(self.bg_color)
+            # Desenha os elementos na tela
+            self.ship.blitme()
+            self.aliens.draw(self.screen) # Desenha os alienígenas presentes no grupo de alienígenas na tela
+            self.bullets.draw(self.screen) # Desenha os projéteis presentes no grupo de projéteis na tela
 
             # Torna visível a tela mais recente
             pygame.display.flip()
-            
-            self.bullets.update() # Atualiza a posição de cada projétil no grupo de projéteis
-    
-            self.aliens.update() # Atualiza a posição de cada alienígena no grupo de alienígenas
-            Alien.alien_collision(self)
             
