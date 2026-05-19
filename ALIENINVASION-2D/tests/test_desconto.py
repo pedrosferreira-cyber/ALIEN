@@ -21,4 +21,3 @@ def test_desconto_vip_100(desconto_vip):
 
 def test_desconto_vip_20(desconto_vip):
     assert DescontoVIP(200) == 40
-
